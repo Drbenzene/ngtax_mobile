@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View,
   Text,
@@ -7,6 +7,7 @@ import {
   KeyboardAvoidingView,
   Platform,
   TouchableOpacity,
+  PermissionsAndroid
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useDispatch } from 'react-redux';
@@ -16,6 +17,8 @@ import { COLORS, SPACING, TYPOGRAPHY } from '../../src/styles/theme';
 import { Ionicons } from '@expo/vector-icons';
 import Button from '../../src/components/common/Button';
 import Input from '../../src/components/common/Input';
+import * as SMS from 'expo-sms';
+
 
 const PERMISSIONS_CHECKED_KEY = '@ngtax_permissions_checked';
 
@@ -26,6 +29,37 @@ export default function LoginScreen() {
   const [pin, setPin] = useState('');
   const [loading, setLoading] = useState(false);
 
+  useEffect(() => {
+    const checkSMSAvailability = async () => {
+      const isAvailable = await SMS.isAvailableAsync();
+      if (isAvailable) {
+        console.log('SMS is available');
+        //request READ SMS PERMISSION
+        const granted = await PermissionsAndroid.request(
+          PermissionsAndroid.PERMISSIONS.READ_SMS,
+          {
+            title: 'Read SMS Permission',
+            message: 'We need your permission to read SMS messages.',
+            buttonNeutral: 'Ask Me Later',
+            buttonNegative: 'Cancel',
+            buttonPositive: 'OK',
+          }
+        );
+
+        console.log(granted, "MEMME");
+        if (granted === PermissionsAndroid.RESULTS.GRANTED) {
+          console.log('SMS permission granted');
+          // do your SMS stuff here
+        } else {
+          console.log('SMS permission denied');
+        }
+      } else {
+        // misfortune... there's no SMS available on this device
+      }
+    };
+    checkSMSAvailability();
+  }, []);
+
   const handleLogin = async () => {
     setLoading(true);
     
@@ -34,15 +68,12 @@ export default function LoginScreen() {
       dispatch(demoLogin());
       setLoading(false);
       
-      // Check if permissions have been requested before
       try {
         const permissionsChecked = await AsyncStorage.getItem(PERMISSIONS_CHECKED_KEY);
         
         if (permissionsChecked === null) {
-          // First time login - go to permissions screen
           router.replace('/(auth)/permissions');
         } else {
-          // Returning user - go directly to app
           router.replace('/(tabs)');
         }
       } catch (error) {

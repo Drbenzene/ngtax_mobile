@@ -13,21 +13,35 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.boyinbode.ngtax-app"
     },
     "android": {
+      "permissions": [
+        "READ_SMS",
+        "RECEIVE_SMS",
+        "READ_SMS",
+        "RECEIVE_SMS"
+      ],
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
       "edgeToEdgeEnabled": true,
-      "predictiveBackGestureEnabled": false
+      "predictiveBackGestureEnabled": false,
+      "package": "com.boyinbode.ngtax_app"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       "expo-router"
-    ]
+    ],
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "95f9fe26-5c3e-46ee-b257-c72d0d979707"
+      }
+    }
   }
 }
